@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .el-row{
+            margin-top:20px;
+
+        }
+        .el-button{
+            padding-left: 35%;
+            padding-right: 35%;
+            width: 100%;
+        }
+        #loginTable{
+            margin-top: 20%;
+            width: 370px;
+            height: 400px;
+            background-color: burlywood;
+        }
+    </style>
+</head>
+
+
+<body>
+<div id="app">
+    <div id="loginTable">
+        <el-row :gutter="20">
+            <el-col :span="16">
+                <el-input v-model = "passwordForm.userName" placeholder = "用户名/手机号/身份证号"></el-input>
+            </el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="16">
+                <el-input type = "password" v-model = "passwordForm.password" placeholder = "密码"></el-input>
+            </el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="8">
+                <el-button @click="visible = true">登陆</el-button>
+            </el-col>
+            <el-col :span="8">
+                <el-button @click="visible = true">重置</el-button>
+            </el-col>
+        </el-row>
+
+        <el-dialog :visible.sync="visible" title="Hello world">
+            <p>Try Element</p>
+        </el-dialog>
+    </div>
+</div>
+</body>
+
+
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function() {
+            return { visible: false }
+        },
+        methods:{
+
+        }
+    })
+</script>
+</html>

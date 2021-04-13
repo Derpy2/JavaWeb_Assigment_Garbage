@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>垃圾数据操作</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="../plugin/elementui.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="table" class="container" style="width:800px; display:block; margin:0 auto;">
+    <el-row :gutter="10">
+        <el-col :span="12">
+            <el-button size="mini" type="primary" @click="handleAdd">新增</el-button>
+        </el-col>
+        <el-col :span="9">
+            <el-input size="mini" v-model="queryText" placeholder="名称/备注"></el-input>
+        </el-col>
+        <el-col :span="3">
+            <el-button size="mini" type="warning" @click="handleQuery">查询</el-button>
+        </el-col>
+    </el-row>
+    <!--数据表格开始-->
+    <el-table :data="listTable" v-loading="listLoading">
+        <el-table-column label="序号" prop="garbageID" align="center" width="80">
+        </el-table-column>
+        <el-table-column label="名称" prop="garbageName" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="垃圾类型ID" prop="sortID" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="添加时间" prop="createTime" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="图片地址" prop="imageUrl" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="240">
+            <template slot-scope="scope">
+                <el-button size="mini" type="success"
+                           @click="handleEdit(scope.$index, scope.row)">编辑
+                </el-button>
+                <el-button size="mini" type="info"
+                           @click="handleUpload(scope.$index, scope.row)">图片
+                </el-button>
+                <el-button size="mini" type="danger"
+                           @click="handleDelete(scope.$index, scope.row)">删除
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!--数据表格结束-->
+    <!--数据分页开始-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :page-sizes="[5, 10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+    <!--数据分页结束-->
+    <!--新增编辑开始-->
+    <el-dialog title="垃圾类别" width="600px" :visible.sync="dlgFormVisible">
+        <el-form :model="dlgForm" :rules="rules" ref="dlgForm" :label-width="formLabelWidth">
+            <el-input type="hidden" v-model="dlgForm.garbageID"></el-input>
+            <el-form-item label="名称:" prop="garbageName" style="margin-top: -30px;">
+                <el-input v-model="dlgForm.garbageName" placeholder="请输入名称"></el-input>
+            </el-form-item>
+            <el-form-item label="类别号:" prop="sortID">
+                <el-input v-model="dlgForm.sortID" placeholder="请输入类别号(1-4)"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button size="mini" @click="closeForm('dlgForm')">取 消</el-button>
+                <el-button size="mini" type="primary" @click="submitForm('dlgForm')">确 定</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+    <!--新增编辑结束-->
+    <!--图片上传开始-->
+    <el-dialog title="图片上传" width="300px" :visible.sync="dlgUploadVisible">
+        <el-form :model="dlgUpload" ref="dlgUpload">
+            <el-form-item>
+                <input type="file" ref="file" @change="getFile($event)" multiple="multiplt"/>
+            </el-form-item>
+            <el-form-item>
+                <el-button size="mini" @click="closeUpload('dlgUpload')">取 消</el-button>
+                <el-button size="mini" type="primary" @click="submitUpload('dlgUpload')">确 定</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+    <!--图片上传结束-->
+</div>
+<!-- 引入组件库 -->
+<script type="text/javascript" src="../js/vue.min.js"></script>
+<!--<script type="text/javascript" src="../plugin/elementui.js"></script>-->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript" src="../js/axios.min.js"></script>
+
+<script type="text/javascript">
+    const vm = new Vue({
+        el: '#table',
+        data: function () {
+            return {
+                //数据表格
+                listTable: [],
+                listLoading: false,
+                currentPage: 1,
+                pageSize: 10,
+                total: 0,
+                queryText: '',
+                //新增编辑
+                dlgFormVisible: false,
+                formLabelWidth: '70px',
+                opFlag: 'add',
+                dlgForm: {
+                    sortId: 0,
+                    garbageID: 0,
+                    garbageName: '',
+                    imageURL: '',
+                    createTime: '',
+                },
+                rules: {
+                    garbageName: [
+                        {required: true, message: '请输入名称', trigger: 'blur'},
+                        {min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur'}
+                    ],
+                    sortId: [
+                        {required: true, message: '请输入垃圾类型号', trigger: 'blur'},
+                        {min: 1, max: 1, message: '长度为1,范围为[1,4]', trigger: 'blur'}
+                    ]
+                },
+                //图片上传
+                dlgUploadVisible: false,
+                dlgUpload: {
+                    imgData: null,
+                },
+            };
+        },
+        mounted: function () {
+            this.getTableData();
+        },
+        methods: {
+            //获取数据表格数据
+            getTableData: function () {
+                this.listLoading = true;
+                let postData = new FormData();
+                postData.append('queryText', this.queryText);
+                postData.append('currentPage', this.currentPage);
+                postData.append('pageSize', this.pageSize);
+                const _this = this;
+                axios.post('../api/sort/query', postData).then(function (response) {
+                    _this.listLoading = false;
+                    _this.listTable = response.data.listTable;
+                    _this.total = response.data.total;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            //分页PageSize大小改变
+            handleSizeChange: function (size) {
+                this.pageSize = size;
+                this.getTableData();
+            },
+            //分页当前页改变
+            handleCurrentChange: function (currentPage) {
+                this.currentPage = currentPage;
+                this.getTableData();
+            },
+            //查询
+            handleQuery: function () {
+                this.getTableData();
+            },
+            //新增
+            handleAdd: function () {
+                this.dlgFormVisible = true;
+                this.opFlag = 'add';
+                this.dlgForm.sortId = 0;
+                this.dlgForm.garbageName = "";
+                this.dlgForm.imageURL = "";
+                this.dlgForm.createTime = "";
+            },
+            //编辑
+            handleEdit: function (index, row) {
+                this.dlgFormVisible = true;
+                this.opFlag = 'edit';
+                this.dlgForm.sortId = row.sortId;
+                this.dlgForm.garbageName = row.garbageName;
+                this.dlgForm.garbageID = row.garbageID;
+                this.dlgForm.imageURL = "";
+                this.dlgForm.createTime = "";
+            },
+            //删除（应该弹出确认对话框啊！！！）
+            handleDelete: function (index, row) {
+                const _this = this;
+                _this.$confirm('真的真的要删除么', '真的要删除么', {
+                    confirmButtonText: "真的真的真的要删除了",
+                    cancelButtonText: "算了",
+                    type: 'warning'
+                }).then(() => {
+                    let postData = new FormData();
+                    postData.append('garbageID', row.garbageID);
+                    axios.post('../api/sort/remove', postData).then(function (response) {
+                        if (response.data.intResult) {
+                            _this.getTableData();
+                        }
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    this.$message({
+                        type: 'success',
+                        message: '刪除成功'
+                    });
+                });
+
+            },
+            //新增编辑提交
+            submitForm: function (formName) {
+                const _this = this;
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        let postData = new FormData();
+                        postData.append('garbageID', _this.dlgForm.garbageID);
+                        postData.append('garbageName', _this.dlgForm.garbageName);
+                        postData.append('sortID', _this.dlgForm.sortID);
+                        postData.append('imageUrl', _this.dlgForm.imageUrl);
+                        postData.append('createTime', _this.dlgForm.createTime);
+                        axios.post('../api/sort/' + _this.opFlag, postData).then(function (response) {
+                            _this.dlgFormVisible = false;
+                            if (response.data.intResult) {
+                                _this.getTableData();
+                            }
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            //关闭新增编辑对话框
+            closeForm: function (formName) {
+                this.$refs[formName].resetFields();
+                this.dlgFormVisible = false;
+            },
+            //图片上传按钮
+            handleUpload: function (formName) {
+                this.dlgUploadVisible = true;
+            },
+            //检测上传文件变化
+            getFile(event) {
+                let file = event.target.files[0];
+                let reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    this.dlgUpload.imgData = reader.result;
+                }
+            },
+            //图片上传
+            submitUpload: function (formName) {
+                const _this = this;
+                let postData = new FormData();
+                alert(this.dlgUpload.imgData);
+                postData.append('imgBase64', this.dlgUpload.imgData);
+                axios.post('/api/sort/image', postData).then(function (response) {
+                    _this.dlgFormVisible = false;
+                    if (response.data.intResult) {
+                        alert(response.data.objResult);
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            //关闭图片上传对话框
+            closeUpload: function (formName) {
+                this.$refs[formName].resetFields();
+                this.dlgUploadVisible = false;
+            },
+        }
+    })
+</script>
+</body>
+</html>

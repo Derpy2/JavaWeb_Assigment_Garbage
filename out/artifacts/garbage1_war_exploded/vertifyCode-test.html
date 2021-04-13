@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>随机图像验证码</title>
+</head>
+
+<body>
+<div>
+    验证码：<img id="imageCode" onclick="changeImage()" src="./VertifyCode">
+</div>
+
+
+<script type="text/javascript">
+    function changeImage() {
+        document.getElementById("imageCode").src = "./VertifyCode?" + new Date().getTime();
+    }
+</script>
+</body>
+
+</html>

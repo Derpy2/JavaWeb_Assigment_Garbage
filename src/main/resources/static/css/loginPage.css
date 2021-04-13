@@ -1,0 +1,147 @@
+
+body{
+    margin: 0;
+}
+h2 {
+    color: #000000;
+    font-family: "微软雅黑 Light";
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/*html选择器*/
+a:link {
+    color: #337ab7;
+    text-decoration: none;
+    font-family: "微软雅黑 Light";
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/*html选择器*/
+a:visited {
+    color: #337ab7;
+    text-decoration: none;
+    font-family: "微软雅黑 Light";
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/*html选择器*/
+a:hover {
+    color: #337ab7;
+    text-decoration: underline;
+    font-family: "微软雅黑 Light";
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/*html选择器*/
+a:active {
+    color: #337ab7;
+    text-decoration: underline;
+    font-family: "微软雅黑 Light";
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/*class类选择器*/
+.loginTable {
+    margin-top: 30px;
+    width: 95%;
+    border: none;
+}
+
+
+/*class类选择器*/
+.loginTable td {
+    width: 100%;
+    height: 50px;
+    border: none;
+}
+
+/*class类选择器*/
+.loginText {
+    width: 80%;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    font-size: 14px;
+    padding-top: 8px;
+    padding-right: 10px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    border: #000000 1px solid;
+    cursor: hand;
+}
+.vertifyText {
+    width: 40%;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    font-size: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    border: #000000 1px solid;
+    cursor: hand;
+}
+.vertifyCode {
+    width: 35%;
+    padding-right: 15%;
+    float: right;
+}
+
+/*class类选择器*/
+.loginButton {
+    color: black;
+    width: 40%;
+    height: 35px;
+    font: bold 16px 微软雅黑 Light;
+    padding: 1px 20px 0px 20px;
+    border: #212121 1px solid;
+    cursor: hand;
+    background: #ffffff;
+}
+/*id选择器*/
+#rememberMe {
+    margin-left: 10%;
+}
+
+/*id选择器*/
+#loginCheck {
+    color: #000000;
+    font: bold 14px 微软雅黑 Light;
+}
+#BackGround{
+
+}
+#Logo{
+    position: absolute;
+    top:70px;
+    left:80px;
+    z-index: 2;
+}
+#BackGroundGrey{
+    position: absolute;
+    bottom: 0;
+    height: 20%;
+    width: 100%;
+    background-color: #757575;
+    z-index: 1;
+}
+#LoginDiv{
+    position: absolute;
+    background-color: #ffffff;
+    height: 460px;
+    z-index: 3;
+    top:90px;
+    width: 25%;
+    left: 63%;
+}
+#BottomText{
+    position: absolute;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+    bottom: 50px;
+    z-index: 3;
+}

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script type="text/javascript" src="../js/axios.min.js"></script>
+    <script type="text/javascript" src="../js/httpRequest.js"></script>
+    <style>
+        #quiz {
+            margin-left: 30%;
+            width: 40%;
+        }
+
+        #problemllist {
+            margin-left: 30%;
+            width: 40%;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="problemllist"
+     v-loading="loading">
+    <el-card class="clearfix">
+        <div slot="header" class="clearfix">
+            <span>垃圾分类问卷</span>
+            <el-button style="float: right; padding: 3px 0" type="text" @click="submit()">提交</el-button>
+        </div>
+
+        <el-form :label-position="labelPosition" label-width="80px" :disabled="disform">
+            <el-form-item label="">
+                <p>请选择正确的垃圾类别:</p>
+            </el-form-item>
+            <el-form-item :label="problems[1].garbageName">
+                <el-radio-group v-model="radio[1]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[2].garbageName">
+                <el-radio-group v-model="radio[2]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[3].garbageName">
+                <el-radio-group v-model="radio[3]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[4].garbageName">
+                <el-radio-group v-model="radio[4]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[5].garbageName">
+                <el-radio-group v-model="radio[5]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[6].garbageName">
+                <el-radio-group v-model="radio[6]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[7].garbageName">
+                <el-radio-group v-model="radio[7]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[8].garbageName">
+                <el-radio-group v-model="radio[8]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[9].garbageName">
+                <el-radio-group v-model="radio[9]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item :label="problems[10].garbageName">
+                <el-radio-group v-model="radio[10]">
+                    <el-radio :label="1">可回收垃圾</el-radio>
+                    <el-radio :label="2">有害垃圾</el-radio>
+                    <el-radio :label="3">厨余垃圾</el-radio>
+                    <el-radio :label="4">其他垃圾</el-radio>
+                </el-radio-group>
+            </el-form-item>
+        </el-form>
+    </el-card>
+    <el-dialog :visible.sync="visible" title="错误题目">
+        <p v-for="(item, i) in wrongList">{{item}}. 垃圾名: {{problems[item].garbageName}} 垃圾类别: {{sortName[problems[item].sortID]}}</p>
+    </el-dialog>
+
+</div>
+</body>
+
+
+<!--cdn引入ElementUI组件必须先引入Vue-->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- cdn引入ElementUI组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+
+    const vm_quiz = new Vue({
+        el: "#problemllist",
+        data() {
+            return {
+                visible: false,
+                userID: 1,
+                borderline: true,
+                labelPosition: "top",
+                radio: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                sortName: ["", "可回收垃圾", "有害垃圾", "厨余垃圾", "其他垃圾"],
+                problems: [{garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""},
+                    {garbageID: 0, garbageName: "", sortID: 0, imageUrl: ""}
+                ],
+                wrongList:[],
+                loading: true,
+                disform: false,
+            }
+        },
+        mounted() {
+            axios({
+                url: "../user/getUserNameFromSession",
+                method: "post"
+            }).then(res => {
+                console.log(res);
+                this.userID = res.data.objResult.userID;
+            }).catch(err => {
+                console.log(err);
+            });
+            for (let i = 1; i <= 10; i++) {
+                axios({
+                    url: "../garbage/getRandomGarbage",
+                    method: "post",
+                }).then(res => {
+                    this.problems[i].sortID = res.data.sortID;
+                    this.problems[i].garbageID = res.data.garbageID;
+                    this.problems[i].garbageName = res.data.garbageName;
+                    this.problems[i].imageUrl = res.data.imageUrl;
+                    if (this.problems.length == 11) {
+                        this.loading = false;
+                    }
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
+        },
+        methods: {
+            submit: function () {
+
+                brandList = [{
+                    examID: null,
+                    examSN: null,
+                    garbageID: null,
+                    userID: null,
+                    sortID: null,
+                    answerID: null,
+                    createTime: null,
+                }];
+
+                this.disform = true;
+                let examlist = new FormData();
+                examlist.append("total", 10);
+                for (let i = 1; i <= 10; i++) {
+                    examlist.append('listTable[' + (i - 1) + '].examSN', i.toString());
+                    examlist.append('listTable[' + (i - 1) + '].garbageID', this.problems[i].garbageID);
+                    examlist.append('listTable[' + (i - 1) + '].userID', this.userID);
+                    examlist.append('listTable[' + (i - 1) + '].sortID', this.problems[i].sortID);
+                    examlist.append('listTable[' + (i - 1) + '].answerID', this.radio[i]);
+                    examlist.append('listTable[' + (i - 1) + '].createTime', '');
+                }
+
+                axios.post('../exam/insertExamItem', examlist).then(function (res) {
+                    console.log(res);
+                    vm_quiz.visible = true;
+                    vm_quiz.wrongList = [];
+                    const _this=vm_quiz;
+                    try{
+                        for(let i = 1;i <= 10;i++){
+                            if(_this.problems[i].sortID != _this.radio[i]){
+                                _this.wrongList.push(i);
+                            }
+
+                        }
+                    }catch (err){
+                        console.log(err);
+                    }
+
+                }).catch(function (err) {
+                    console.log(err);
+                });
+            },
+            getNowData: function () {
+                let date = new Date();
+                let yyyy = date.getFullYear();
+                let mm = date.getMonth();
+                let dd = date.getDate();
+                let hh = date.getHours();
+                let min = date.getMinutes();
+                let sed = date.getSeconds();
+
+                let res = yyyy + "/" + mm + "/" + dd + " " + hh + ":" + min + ":" + sed;
+                return res;
+            }
+        }
+    });
+
+</script>
+
+</html>

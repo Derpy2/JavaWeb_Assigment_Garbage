@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #myfrom2{
+            width: 80%;
+            margin: auto;
+            margin-top: 30px;
+        }
+        .buttoncss1{
+            width: 32%;
+            height: 40px;
+            font-size: large;
+            font-weight: bold;
+        }
+        .textarea2{
+            border: none;
+            width: 100%;
+            height: 30px;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            margin: auto;
+        }
+        .span1{
+            font-size: 30px;
+            font-family: "微软雅黑 Light";
+            font-weight: bold;
+        }
+        .arror1{
+            width: 25%;
+            margin:auto;
+        }
+        .arror2{
+            width: 25%;
+            margin:auto;
+        }
+        .arror3{
+            width: 25%;
+            margin:auto;
+        }
+        .arror4{
+            width: 25%;
+            margin:auto;
+        }
+    </style>
+    <script type="text/javascript"  src="./vue.min.js"></script>
+</head>
+<body>
+
+<form id="myfrom2">
+
+    <div style="margin-top: 5px; height: 50px;margin: auto;">
+        <span class="span1">{{garbageName}}</span>
+      <!--  <input id="displayarea" class="textarea2" type="text"> -->
+    </div>
+    <div style="margin-top: 5px">
+        <input class="buttoncss1" type="button" value="开始" @click="start()">
+        <input class="buttoncss1" type="button" value="停止" @click="stop()">
+        <input class="buttoncss1" type="button" value="结果" @click="show()">
+    </div>
+
+    <div style="display: flex; height: 80px; margin-left: 3%;">
+        <div class="arror1">
+            <div v-if="handFlag == 1 && resultFlag == 0">
+                <img src="arrow.png" width="66px"/>
+            </div>
+            <div v-if="resultFlag==1 || (garbageType === '有害垃圾' && resultFlag == -1)">
+                <img src="right.png" width="66px"/>
+            </div>
+            <div v-else-if="resultFlag==-1">
+                <img src="wrong.png" width="66px"/>
+            </div>
+        </div>
+        <div class="arror2">
+            <div v-if="handFlag == 2 && resultFlag == 0">
+                <img src="arrow.png" width="66px"/>
+            </div>
+            <div v-if="resultFlag==1 || (garbageType === '可回收垃圾' && resultFlag == -1)">
+                <img src="right.png" width="66px"/>
+            </div>
+            <div v-else-if="resultFlag==-1">
+                <img src="wrong.png" width="66px"/>
+            </div>
+        </div>
+        <div class="arror3">
+            <div v-if="handFlag == 3 && resultFlag == 0">
+                <img src="arrow.png" width="66px"/>
+            </div>
+            <div v-if="resultFlag==1 || (garbageType === '其它垃圾' && resultFlag == -1)">
+                <img src="right.png" width="66px"/>
+            </div>
+            <div v-else-if="resultFlag==-1">
+                <img src="wrong.png" width="66px"/>
+            </div>
+        </div>
+        <div class="arror4">
+            <div v-if="handFlag == 4 && resultFlag == 0">
+                <img src="arrow.png" width="66px"/>
+            </div>
+            <div v-if="resultFlag==1 || (garbageType === '厨余垃圾' && resultFlag == -1)">
+                <img src="right.png" width="66px"/>
+            </div>
+            <div v-else-if="resultFlag==-1">
+                <img src="wrong.png" width="66px"/>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div style="display: flex">
+        <div class="arror1" style="margin-left: 1%" id="garbage1" @mouseenter="enter(1)" @mouseleave="leave()" @click="sorting('有害垃圾', 1)">
+            <img src="danger.png" width="100px"/>
+        </div>
+        <div class="arror2" id="garbage2" @mouseenter="enter(2)" @mouseleave="leave()" @click="sorting('可回收垃圾', 2)">
+            <img src="recycle.png" width="100px"/>
+        </div>
+        <div class="arror3" id="garbage3" @mouseenter="enter(3)" @mouseleave="leave()" @click="sorting('其它垃圾', 3)">
+            <img src="unrecycle.png" width="100px"/>
+        </div>
+        <div class="arror4" id="garbage4" @mouseenter="enter(4)" @mouseleave="leave()" @click="sorting('厨余垃圾', 4)">
+            <img src="wet_garbage.png" width="100px"/>
+        </div>
+    </div>
+
+    <div style="margin-top: 5px">
+        <span>{{playResult}}</span>
+    </div>
+</form>
+<script>
+    const vm = new Vue({
+        el:"#myfrom2",
+        data: {
+            handFlag:0,
+            resultFlag:0,
+            lotteryNum:0,
+            lotteryTimer:0,
+            garbageJson: JSON.parse('[{"garbageId": 1, "garbageFlag": "纸类", "garbageInfo": "再生利用", "garbageName": "报纸", "garbageType": "可回收垃圾"},{"garbageId": 2, "garbageFlag": "纸类", "garbageInfo": "再生利用", "garbageName": "传单", "garbageType": "可回收垃圾"},{"garbageId": 3, "garbageFlag": "纸类", "garbageInfo": "再生利用", "garbageName": "杂志", "garbageType": "可回收垃圾"},{"garbageId": 4, "garbageFlag": "纸类", "garbageInfo": "再生利用", "garbageName": "旧书", "garbageType": "可回收垃圾"},{"garbageId": 5, "garbageFlag": "纸类", "garbageInfo": "再生利用", "garbageName": "纸板箱", "garbageType": "可回收垃圾"},{"garbageId": 6, "garbageFlag": "纸类", "garbageInfo": "再生利用", "garbageName": "未受污染的纸制品", "garbageType": "可回收垃圾"},{"garbageId": 7, "garbageFlag": "金属", "garbageInfo": "再生利用", "garbageName": "铁制品", "garbageType": "可回收垃圾"},{"garbageId": 8, "garbageFlag": "金属", "garbageInfo": "再生利用", "garbageName": "铜制品", "garbageType": "可回收垃圾"},{"garbageId": 9, "garbageFlag": "金属", "garbageInfo": "再生利用", "garbageName": "铝制品", "garbageType": "可回收垃圾"},{"garbageId": 10, "garbageFlag": "玻璃", "garbageInfo": "再生利用", "garbageName": "玻璃瓶罐", "garbageType": "可回收垃圾"},{"garbageId": 11, "garbageFlag": "玻璃", "garbageInfo": "再生利用", "garbageName": "平板玻璃", "garbageType": "可回收垃圾"},{"garbageId": 12, "garbageFlag": "玻璃", "garbageInfo": "再生利用", "garbageName": "其他玻璃制品", "garbageType": "可回收垃圾"},{"garbageId": 13, "garbageFlag": "除塑料袋外的塑料制品", "garbageInfo": "再生利用", "garbageName": "泡沫塑料", "garbageType": "可回收垃圾"},{"garbageId": 14, "garbageFlag": "除塑料袋外的塑料制品", "garbageInfo": "再生利用", "garbageName": "塑料瓶", "garbageType": "可回收垃圾"},{"garbageId": 15, "garbageFlag": "除塑料袋外的塑料制品", "garbageInfo": "再生利用", "garbageName": "硬塑料", "garbageType": "可回收垃圾"},{"garbageId": 16, "garbageFlag": "橡胶及橡胶制品", "garbageInfo": "再生利用", "garbageName": "橡胶及橡胶制品", "garbageType": "可回收垃圾"},{"garbageId": 17, "garbageFlag": "利乐包装", "garbageInfo": "再生利用", "garbageName": "牛奶盒", "garbageType": "可回收垃圾"},{"garbageId": 18, "garbageFlag": "饮料瓶", "garbageInfo": "再生利用", "garbageName": "可乐罐", "garbageType": "可回收垃圾"},{"garbageId": 19, "garbageFlag": "饮料瓶", "garbageInfo": "再生利用", "garbageName": "塑料饮料瓶", "garbageType": "可回收垃圾"},{"garbageId": 20, "garbageFlag": "饮料瓶", "garbageInfo": "再生利用", "garbageName": "啤酒瓶", "garbageType": "可回收垃圾"},{"garbageId": 21, "garbageFlag": "电池", "garbageInfo": "安全填埋、焚烧", "garbageName": "蓄电池", "garbageType": "有害垃圾"},{"garbageId": 22, "garbageFlag": "电池", "garbageInfo": "安全填埋、焚烧", "garbageName": "钮扣电池", "garbageType": "有害垃圾"},{"garbageId": 23, "garbageFlag": "废旧电子产品", "garbageInfo": "安全填埋、焚烧", "garbageName": "废旧电子产品", "garbageType": "有害垃圾"},{"garbageId": 24, "garbageFlag": "废旧灯管灯泡", "garbageInfo": "安全填埋、焚烧", "garbageName": "废旧灯管灯泡", "garbageType": "有害垃圾"},{"garbageId": 25, "garbageFlag": "过期药品", "garbageInfo": "安全填埋、焚烧", "garbageName": "过期药品", "garbageType": "有害垃圾"},{"garbageId": 26, "garbageFlag": "过期日用化妆品", "garbageInfo": "安全填埋、焚烧", "garbageName": "过期日用化妆品", "garbageType": "有害垃圾"},{"garbageId": 27, "garbageFlag": "染发剂", "garbageInfo": "安全填埋、焚烧", "garbageName": "染发剂", "garbageType": "有害垃圾"},{"garbageId": 28, "garbageFlag": "杀虫剂容器", "garbageInfo": "安全填埋、焚烧", "garbageName": "杀虫剂容器", "garbageType": "有害垃圾"},{"garbageId": 29, "garbageFlag": "除草剂容器", "garbageInfo": "安全填埋、焚烧", "garbageName": "除草剂容器", "garbageType": "有害垃圾"},{"garbageId": 30, "garbageFlag": "废弃水银温度计", "garbageInfo": "安全填埋、焚烧", "garbageName": "废弃水银温度计", "garbageType": "有害垃圾"},{"garbageId": 31, "garbageFlag": "废油漆桶", "garbageInfo": "安全填埋、焚烧", "garbageName": "废油漆桶", "garbageType": "有害垃圾"},{"garbageId": 32, "garbageFlag": "废打印机墨盒", "garbageInfo": "安全填埋、焚烧", "garbageName": "废打印机墨盒", "garbageType": "有害垃圾"},{"garbageId": 33, "garbageFlag": "硒鼓", "garbageInfo": "安全填埋、焚烧", "garbageName": "硒鼓", "garbageType": "有害垃圾"},{"garbageId": 34, "garbageFlag": "食物残余", "garbageInfo": "堆肥、制作饲料", "garbageName": "剩菜剩饭", "garbageType": "厨余垃圾"},{"garbageId": 35, "garbageFlag": "食物残余", "garbageInfo": "堆肥、制作饲料", "garbageName": "西餐糕点", "garbageType": "厨余垃圾"},{"garbageId": 36, "garbageFlag": "菜梗菜叶", "garbageInfo": "堆肥、制作饲料", "garbageName": "菜梗菜叶", "garbageType": "厨余垃圾"},{"garbageId": 37, "garbageFlag": "动物骨骼内脏", "garbageInfo": "堆肥、制作饲料", "garbageName": "动物骨骼内脏", "garbageType": "厨余垃圾"},{"garbageId": 38, "garbageFlag": "茶叶渣", "garbageInfo": "堆肥、制作饲料", "garbageName": "茶叶渣", "garbageType": "厨余垃圾"},{"garbageId": 39, "garbageFlag": "水果残余", "garbageInfo": "堆肥、制作饲料", "garbageName": "水果残余", "garbageType": "厨余垃圾"},{"garbageId": 40, "garbageFlag": "果壳瓜皮", "garbageInfo": "堆肥、制作饲料", "garbageName": "果壳瓜皮", "garbageType": "厨余垃圾"},{"garbageId": 41, "garbageFlag": "盆景等植物", "garbageInfo": "堆肥、制作饲料", "garbageName": "残枝落叶", "garbageType": "厨余垃圾"},{"garbageId": 42, "garbageFlag": "废弃食用油", "garbageInfo": "堆肥、制作饲料", "garbageName": "废弃食用油", "garbageType": "厨余垃圾"},{"garbageId": 43, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "纸杯", "garbageType": "其它垃圾"},{"garbageId": 44, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "照片", "garbageType": "其它垃圾"},{"garbageId": 45, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "复写纸", "garbageType": "其它垃圾"},{"garbageId": 46, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "压敏纸", "garbageType": "其它垃圾"},{"garbageId": 47, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "收据用纸", "garbageType": "其它垃圾"},{"garbageId": 48, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "明星片", "garbageType": "其它垃圾"},{"garbageId": 49, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "相册", "garbageType": "其它垃圾"},{"garbageId": 50, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "卫生纸", "garbageType": "其它垃圾"},{"garbageId": 51, "garbageFlag": "受污染与无法再生的纸张", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "尿片", "garbageType": "其它垃圾"},{"garbageId": 52, "garbageFlag": "受污染或其他不可回收的玻璃", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "受污染或其他不可回收的玻璃", "garbageType": "其它垃圾"},{"garbageId": 53, "garbageFlag": "塑料袋与其他受污染的塑料制品", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "塑料袋与其他受污染的塑料制品", "garbageType": "其它垃圾"},{"garbageId": 54, "garbageFlag": "废旧衣物与其他纺织品", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "废旧衣物与其他纺织品", "garbageType": "其它垃圾"},{"garbageId": 55, "garbageFlag": "破旧陶瓷品", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "破旧陶瓷品", "garbageType": "其它垃圾"},{"garbageId": 56, "garbageFlag": "妇女卫生用品", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "妇女卫生用品", "garbageType": "其它垃圾"},{"garbageId": 57, "garbageFlag": "一次性餐具", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "一次性餐具", "garbageType": "其它垃圾"},{"garbageId": 58, "garbageFlag": "贝壳", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "贝壳", "garbageType": "其它垃圾"},{"garbageId": 59, "garbageFlag": "烟头", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "烟头", "garbageType": "其它垃圾"},{"garbageId": 60, "garbageFlag": "灰土", "garbageInfo": "可燃部分焚烧发电，不可燃部分卫生填埋", "garbageName": "灰土", "garbageType": "其它垃圾"}]'),
+            garbageName:"",
+            garbageType:"",
+            playResult:""
+        },
+        mounted :function () {
+
+        },
+        methods: {
+            enter: function (garbageNum){
+                this.handFlag = garbageNum;
+            },
+            leave:function () {
+                this.handFlag = 0;
+            },
+            sorting: function (garbageType, garbageNum) {
+                this.resultFlag = 0;
+                this.garbageType = this.garbageJson[this.lotteryNum].garbageType;
+                if(this.garbageJson[this.lotteryNum].garbageType == garbageType){
+                    this.resultFlag = garbageNum;
+                    this.resultFlag = 1;
+                }
+                else{
+                    this.resultFlag = -1;
+                    alert(this.garbageJson[this.lotteryNum].garbageType);
+                }
+            },
+            lottery:function () {
+                this.lotteryNum = Math.floor(Math.random() * this.garbageJson.length);
+                this.garbageName = this.garbageJson[this.lotteryNum].garbageName;
+            },
+            start: function () {
+                this.resultFlag = 0;
+                if(!this.lotteryTimer){
+                    this.lotteryTimer = setInterval(this.lottery,500);
+                }
+            },
+            stop:function () {
+                clearInterval(this.lotteryTimer);
+                this.lotteryTimer = null;
+            },
+            show:function () {
+                this.playResult = "{" +"resultFlag:" + (this.resultFlag + "")+", "+
+                    "garbageId:"+this.lotteryNum+", "+
+                    "garbageFlag:"+this.garbageJson[this.lotteryNum].garbageFlag+", "+
+                    "garbageInfo:"+this.garbageJson[this.lotteryNum].garbageInfo+", "+
+                    "garbageName:"+this.garbageJson[this.lotteryNum].garbageName+", "+
+                    "garbageType:"+this.garbageJson[this.lotteryNum].garbageType+
+                    "}";
+            }
+        }
+    })
+</script>
+</body>
+</html>

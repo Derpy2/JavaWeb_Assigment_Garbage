@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息审核</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="../plugin/elementui.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="table" class="container" style="width:1000px; display:block; margin:0 auto;">
+    <el-row :gutter="10">
+        <el-col :span="9">
+            <el-input size="mini" v-model="queryText" placeholder="名称/备注"></el-input>
+        </el-col>
+        <el-col :span="3">
+            <el-button size="mini" type="warning" @click="handleQuery">查询</el-button>
+        </el-col>
+    </el-row>
+    <!--数据表格开始-->
+    <el-table :data="listTable" v-loading="listLoading">
+        <el-table-column label="序号" prop="userID" align="center" width="80">
+        </el-table-column>
+        <el-table-column label="姓名" prop="userName" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="手机号码" prop="userPhone" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="身份证号" prop="userCard" align="center" width="200">
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="240">
+            <template slot-scope="scope">
+                <el-button size="mini" type="success"
+                           @click="handleCheckTrue(scope.$index, scope.row)">同意申请
+                </el-button>
+                <el-button size="mini" type="danger"
+                           @click="handleCheckFalse(scope.$index, scope.row)">拒绝申请
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!--数据表格结束-->
+    <!--数据分页开始-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :page-sizes="[5, 10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+    <!--数据分页结束-->
+</div>
+<!-- 引入组件库 -->
+<script type="text/javascript" src="../js/vue.min.js"></script>
+<!--<script type="text/javascript" src="../plugin/elementui.js"></script>-->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript" src="../js/axios.min.js"></script>
+
+<script type="text/javascript">
+    const vm = new Vue({
+        el: '#table',
+        data: function () {
+            return {
+                //数据表格
+                listTable: [],
+                listLoading: false,
+                currentPage: 1,
+                pageSize: 10,
+                total: 0,
+                queryText: '',
+                //新增编辑
+                formLabelWidth: '70px',
+                dlgForm: {
+                    userID: 0,
+                    userName: '',
+                    userPhone: '',
+                    userPwd: '',
+                    userCard: '',
+                    userStatus: 0,
+                },
+            };
+        },
+        mounted: function () {
+            this.getTableData();
+        },
+        methods: {
+            //获取数据表格数据
+            getTableData: function () {
+                this.listLoading = true;
+                let postData = new FormData();
+                postData.append('queryText', this.queryText);
+                postData.append('currentPage', this.currentPage);
+                postData.append('pageSize', this.pageSize);
+                const _this = this;
+                axios.post('../api/admin/query', postData).then(function (response) {
+                    _this.listLoading = false;
+                    _this.listTable = response.data.listTable;
+                    _this.total = response.data.total;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            //分页PageSize大小改变
+            handleSizeChange: function (size) {
+                this.pageSize = size;
+                this.getTableData();
+            },
+            //分页当前页改变
+            handleCurrentChange: function (currentPage) {
+                this.currentPage = currentPage;
+                this.getTableData();
+            },
+            //查询
+            handleQuery: function () {
+                this.getTableData();
+            },
+            //同意
+            handleCheckTrue: function (index, row) {
+                const _this = this;
+                _this.$confirm('真的真的要同意么', '真的要同意么', {
+                    confirmButtonText: "真的真的真的要同意了",
+                    cancelButtonText: "算了",
+                    type: 'warning'
+                }).then(() => {
+                    let postData = new FormData();
+                    postData.append('userID', row.userID);
+                    axios.post('../api/admin/updateTrue', postData).then(function (response) {
+                        if (response.data.intResult) {
+                            _this.getTableData();
+                        }
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    this.$message({
+                        type: 'success',
+                        message: '成功同意'
+                    });
+                });
+            },
+            //拒绝
+            handleCheckFalse: function (index, row) {
+                const _this = this;
+                _this.$confirm('真的真的要拒绝么', '真的要拒绝么', {
+                    confirmButtonText: "真的真的真的要拒绝了",
+                    cancelButtonText: "算了",
+                    type: 'warning'
+                }).then(() => {
+                    let postData = new FormData();
+                    postData.append('userID', row.userID);
+                    axios.post('../api/admin/updateFalse', postData).then(function (response) {
+                        if (response.data.intResult) {
+                            _this.getTableData();
+                        }
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    this.$message({
+                        type: 'success',
+                        message: '成功拒绝'
+                    });
+                });
+            },
+        }
+    })
+</script>
+</body>
+</html>

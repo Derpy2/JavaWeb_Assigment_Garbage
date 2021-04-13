@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- import Vue before Element -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script type="text/javascript" src="../js/axios.min.js"></script>
+    <script type="text/javascript"  src="../js/vue.min.js"></script>
+    <script type="text/javascript"  src="../js/httpRequest.js"></script>
+    <style>
+        body{
+            margin: 0 auto;
+            height: 100%;
+            width: 100%;
+        }
+        #buttondiv{
+            position: absolute;
+            top: 100px;
+            left:10%;
+            width: 80%;
+        }
+        #garbageNameBlock{
+            font: bold 24px "微软雅黑 Light" ;
+        }
+        .buttoncss{
+            width: 30%;
+        }
+        #garbageSortPic{
+            position: absolute;
+            top:240px;
+            display: flex;
+        }
+        #arrow{
+            display: flex;
+        }
+        #yesorworng{
+            display: flex;
+        }
+        .arrow2{
+            margin-left: 300px;
+        }
+        .arrow3{
+            margin-left: 300px;
+        }
+        .arrow4{
+            margin-left: 300px;
+        }
+        .arrow22{
+            margin-left: 200px;
+        }
+        .arrow33{
+            margin-left: 200px;
+        }
+        .arrow44{
+            margin-left: 200px;
+        }
+    </style>
+</head>
+
+
+<body>
+<div id="app">
+
+    <div id="buttondiv">
+        <div class="tip" id="garbageNameBlock">
+            <p>{{garbageName}}</p>
+        </div>
+        <el-button class="buttoncss" @click="start()">开始</el-button>
+        <el-button class="buttoncss" @click="stop()">停止</el-button>
+        <el-button class="buttoncss" @click="show()">结果</el-button>
+        <div style="margin-top: 10px;">
+
+
+        <div id="arrow" class="block">
+            <div class="arrow1">
+                <div v-if="handFlag == 1 && resultFlag == 0">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[0]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+            <div class="arrow2">
+                <div v-if="handFlag == 2 && resultFlag == 0">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[0]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+            <div class="arrow3">
+                <div v-if="handFlag == 3 && resultFlag == 0">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[0]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+            <div class="arrow4">
+                <div v-if="handFlag == 4 && resultFlag == 0">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[0]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+        </div>
+        <div id="yesorworng" class="blcok">
+            <div>
+                <div v-if="resultFlag==1 || (garbageType === '有害垃圾' && resultFlag == -1)">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[1]"
+                    >
+                    </el-image>
+                </div>
+                <div v-else-if="resultFlag==-1">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[2]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+            <div class="arrow22">
+                <div v-if="resultFlag==1 || (garbageType === '可回收垃圾' && resultFlag == -1)">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[1]"
+                    >
+                    </el-image>
+                </div>
+                <div v-else-if="resultFlag==-1">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[2]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+            <div class="arrow22">
+                <div v-if="resultFlag==1 || (garbageType === '其他垃圾' && resultFlag == -1)">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[1]"
+                    >
+                    </el-image>
+                </div>
+                <div v-else-if="resultFlag==-1">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[2]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+            <div class="arrow22">
+                <div v-if="resultFlag==1 || (garbageType === '厨余垃圾' && resultFlag == -1)">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[1]"
+                    >
+                    </el-image>
+                </div>
+                <div v-else-if="resultFlag==-1">
+                    <el-image
+                            style="width: 100px; height: 100px"
+                            :src="pictureUrl[2]"
+                    >
+                    </el-image>
+                </div>
+            </div>
+        </div>
+        <div id="garbageSortPic" class="block">
+            <div class="arrow11" id="garbage1" @mouseenter="enter(1)" @mouseleave="leave()" @click="sorting('有害垃圾', 2)">
+                <el-image
+                        style="width: 100px; height: 100px"
+                        :src="pictureUrl[3]"
+                >
+                </el-image>
+            </div>
+            <div class="arrow22" id="garbage2" @mouseenter="enter(2)" @mouseleave="leave()" @click="sorting('可回收垃圾', 1)">
+                <el-image
+                        style="width: 100px; height: 100px"
+                        :src="pictureUrl[4]"
+                >
+                </el-image>
+            </div>
+            <div class="arrow33" id="garbage3" @mouseenter="enter(3)" @mouseleave="leave()" @click="sorting('其它垃圾', 4)">
+                <el-image
+                        style="width: 100px; height: 100px"
+                        :src="pictureUrl[5]"
+                >
+                </el-image>
+            </div>
+            <div class="arrow44" id="garbage4" @mouseenter="enter(4)" @mouseleave="leave()" @click="sorting('厨余垃圾', 3)">
+                <el-image
+                        style="width: 100px; height: 100px"
+                        :src="pictureUrl[6]"
+                >
+                </el-image>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <el-dialog :visible.sync="visible" title="正确答案">
+        <p>{{garbageType}}</p>
+    </el-dialog>
+    <el-dialog :visible.sync="visible1" title="统计">
+        <p>总次数: {{answerCount}}  正确次数: {{correctCount}}</p>
+    </el-dialog>
+</div>
+</body>
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script>
+    const vm_game = new Vue({
+        el: '#app',
+        data: function() {
+            return {
+                visible: false,
+                visible1:false,
+                answerCount:0,
+                correctCount:0,
+                handFlag:0,
+                resultFlag:0,
+                lotteryNum:0,
+                lotteryTimer:0,
+                garbageSortDic: JSON.parse('{"1": "可回收垃圾", "2": "有害垃圾", "3": "厨余垃圾", "4": "其他垃圾"}'),
+                garbageID:0,
+                garbageName:"无垃圾",
+                garbageSortID:0,
+                garbageType:"",
+                imageUrl:"",
+                playResult:"",
+                pictureUrl:["../Picture/arrow.png", "../Picture/right.png", "../Picture/wrong.png", "../Picture/danger.png",
+                    "../Picture/recycle.png", "../Picture/unrecycle.png","../Picture/wet_garbage.png"],
+            }
+        },
+        methods: {
+            enter: function (garbageNum){
+
+                this.handFlag = garbageNum;
+            },
+            leave:function () {
+                this.handFlag = 0;
+            },
+            sorting: function (mygarbageType, mygarbageTypeID) {
+                vm_game.stop();
+                this.resultFlag = 0;
+                axios({
+                    url:"../garbage/getGarbageSort",
+                    method: "post",
+                    params:{
+                        garbageID: this.garbageID,
+                    },
+                }).then(res =>{
+                    console.log(res);
+                    this.garbageSortID = res.data.intResult;
+                    this.garbageType = this.garbageSortDic[this.garbageSortID.toString()];
+                    console.log(this.garbageType);
+                    this.answerCount += 1;
+                    if(this.garbageSortID == mygarbageTypeID){
+                        this.resultFlag = 1;
+                        this.correctCount += 1;
+                    }
+                    else{
+                        this.resultFlag = -1;
+                        this.visible = true;
+                        //alert("正确答案:" + this.garbageType);
+                    }
+                }).catch(err =>{
+                    console.log(err);
+                });
+            },
+            lottery:function () {
+                //获得随机垃圾
+                axios({
+                    url:"../garbage/getRandomGarbage",
+                    method:"post",
+                }).then(res =>{
+                    console.log(res);
+                    this.garbageName = res.data.garbageName;
+                    this.garbageID = res.data.garbageID;
+                    this.imageUrl = res.data.imageUrl;
+                }).catch(err =>{
+                    console.log(err);
+                });
+            },
+            start: function () {
+                this.resultFlag = 0;
+                if(!this.lotteryTimer){
+                    this.lotteryTimer = setInterval(this.lottery,500);
+                }
+            },
+            stop:function () {
+                clearInterval(this.lotteryTimer);
+                this.lotteryTimer = null;
+            },
+            show:function () {
+                this.playResult = "{" +"resultFlag:" + (this.resultFlag + "")+", "+
+                    "garbageId:"+this.garbageID+", "+
+                    "garbageName:"+this.garbageName+", "+
+                    "garbageType:"+this.garbageSortDic[this.garbageSortID.toString()]+
+                    "}";
+                this.visible1 = true;
+            }
+        }
+    });
+</script>
+</html>

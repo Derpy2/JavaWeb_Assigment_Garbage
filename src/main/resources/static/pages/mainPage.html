@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GCS.主页</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script type="text/javascript" src="../js/axios.min.js"></script>
+    <script type="text/javascript"  src="../js/httpRequest.js"></script>
+    <style>
+        #leftbar{
+            height: 100%;
+        }
+        .el-menu-vertical-demo{
+            min-height: 900px;
+        }
+        #panel{
+            height: 700px;
+        }
+    </style>
+</head>
+<body style="margin: 0;">
+    <div id = "topbar">
+        <el-menu
+                mode="horizontal"
+                @select="handleSelect"
+                background-color="#545c64"
+                text-color="#fff"
+                active-text-color="#ffd04b">
+            <el-menu-item index="1">
+                <img src="../Picture/GCS_Icon2.png" height="30px" width="88px">
+            </el-menu-item>
+            <el-menu-item style="float: right; padding: 3px 0; width: 180px;">
+                <el-button style="margin: 0 auto;padding-left: 20px;" type="text">欢迎，{{userName}}</el-button>
+            </el-menu-item>
+        </el-menu>
+    </div>
+    <div id="leftbar">
+        <el-col style="width: 12%;">
+        <el-menu
+                class="el-menu-vertical-demo"
+                background-color="#545c64"
+                text-color="#fff"
+                active-text-color="#ffd04b"
+                border-right="solid 0px"
+                @select="handSelect">
+            <el-menu-item index="1">
+                问卷测试
+            </el-menu-item>
+            <el-menu-item index="2"
+                    v-if="controlPanel"
+                    >
+                系统管理
+            </el-menu-item>
+            <el-menu-item index="3">
+                小游戏
+            </el-menu-item>
+        </el-menu>
+        </el-col>
+    </div>
+
+    <div id="panel">
+        <iframe id="iframe" style="width: 88%;height: 120%;border-width: 0px;" src="game.html"></iframe>
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- cdn引入ElementUI组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    <!--头部标签条-->
+    const vm = new Vue({
+        el:"#topbar",
+        data:{
+            userID: 0,
+            userName:"CyanCloud1sdf",
+        },
+        mounted(){
+            axios({
+                url:"../user/getUserNameFromSession",
+                method:"post"
+            }).then(res =>{
+                console.log(res);
+                this.userName = res.data.objResult.userName;
+                this.userID = res.data.objResult.userID;
+                if(res.data.intResult == 1){
+                    vm1.controlPanel = true;
+                }
+            }).catch(err=> {
+               console.log(err);
+            });
+        },
+        methods: {
+            handleSelect(key, keyPath){
+                console.log(key, keyPath);
+                activeIndex2 = keyPath;
+            }
+        }
+    });
+    <!--侧边标签条-->
+    const vm_leftbar = new Vue({
+        el: '#leftbar',
+        data: {
+            controlPanel:false,
+            iframUrl: "game.html",
+            urls: ["","quiz.html","AdminQues.html","game.html"],
+        },
+        methods:{
+            handSelect(tab, event){
+                console.log(tab);
+                console.log(event);
+                document.getElementById("iframe").src = this.urls[tab];
+            }
+        }
+    });
+</script>
+</html>
